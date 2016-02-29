@@ -234,7 +234,7 @@ public abstract class Graph {
 
 	
 	public static void main (String[] args) {
-		GraphLoader.createIntersectionsFile("data/maps/myucsd.map", "data/intersections/myucsd.intersections");
+		GraphLoader.createIntersectionsFile("data/testdata/simpletest.map", "data/intersections/myucsd.intersections");
 		
 
 		// For testing of Part 1 functionality
