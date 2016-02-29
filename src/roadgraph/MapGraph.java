@@ -8,7 +8,12 @@
 package roadgraph;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -24,7 +29,9 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
-	
+	private int numVertices;
+	private int numEdges;
+	private HashMap<GeographicPoint, ArrayList<GeographicPoint>> graph;
 	
 	/** 
 	 * Create a new empty MapGraph 
@@ -32,6 +39,9 @@ public class MapGraph {
 	public MapGraph()
 	{
 		// TODO: Implement in this constructor in WEEK 2
+		numVertices = 0;
+		numEdges = 0;
+		graph = new HashMap<GeographicPoint, ArrayList<GeographicPoint>>();
 	}
 	
 	/**
@@ -41,7 +51,7 @@ public class MapGraph {
 	public int getNumVertices()
 	{
 		//TODO: Implement this method in WEEK 2
-		return 0;
+		return this.numVertices;
 	}
 	
 	/**
@@ -51,7 +61,7 @@ public class MapGraph {
 	public Set<GeographicPoint> getVertices()
 	{
 		//TODO: Implement this method in WEEK 2
-		return null;
+		return this.graph.keySet();
 	}
 	
 	/**
@@ -61,7 +71,7 @@ public class MapGraph {
 	public int getNumEdges()
 	{
 		//TODO: Implement this method in WEEK 2
-		return 0;
+		return this.numEdges;
 	}
 
 	
@@ -76,7 +86,13 @@ public class MapGraph {
 	public boolean addVertex(GeographicPoint location)
 	{
 		// TODO: Implement this method in WEEK 2
-		return false;
+		if (location == null || this.getVertices().contains(location)){			
+			return false;
+		} else {
+			this.graph.put(location, new ArrayList<GeographicPoint>());
+			this.numVertices += 1;
+			return true;
+		}
 	}
 	
 	/**
@@ -95,7 +111,20 @@ public class MapGraph {
 			String roadType, double length) throws IllegalArgumentException {
 
 		//TODO: Implement this method in WEEK 2
-		
+		if ( from == null ){
+			throw new IllegalArgumentException("from intersection is null!");
+		} else if (to == null){
+			throw new IllegalArgumentException("to intersection is null!");
+		} else if (length < 0){
+			throw new IllegalArgumentException("road length is less than 0!");
+		} else if (!this.getVertices().contains(from)){
+			throw new IllegalArgumentException("from intersection is not in the graph!");
+		} else if (!this.getVertices().contains(to)){
+			throw new IllegalArgumentException("to intersection is not in the graph!");
+		} else {
+			this.graph.get(from).add(to);
+			this.numEdges += 1;
+		}
 	}
 	
 
@@ -127,8 +156,48 @@ public class MapGraph {
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
-
-		return null;
+		ArrayList<GeographicPoint> path = new ArrayList<GeographicPoint>();
+		HashMap<GeographicPoint, GeographicPoint> parentMap = 
+				new HashMap<GeographicPoint, GeographicPoint>();
+		
+		parentMap.put(start, null);
+		
+		HashSet<GeographicPoint> explored = new HashSet<GeographicPoint>();
+		Queue<GeographicPoint> queue = new LinkedList<GeographicPoint>();
+		queue.add(start);
+		explored.add(start);
+		nodeSearched.accept(start);
+		
+		boolean found = false;
+		while( !queue.isEmpty() ){
+			GeographicPoint current = queue.poll();
+			
+			if (current.equals(goal)){
+				found = true;
+				break;
+			}
+			
+			for(GeographicPoint neighbor : this.graph.get(current)){
+				if (!explored.contains(neighbor)){
+					queue.add(neighbor);
+					explored.add(neighbor);
+					parentMap.put(neighbor, current);
+					nodeSearched.accept(neighbor);
+				}
+			}
+			
+		}
+		
+		//construct path
+		if (!found) return null;
+		else {
+			GeographicPoint node = goal;
+			while(node != null){
+				path.add(0, node);
+				node = parentMap.get(node);
+			}
+			return path;
+		}
 	}
 	
 

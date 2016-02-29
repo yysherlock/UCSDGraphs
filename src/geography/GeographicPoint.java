@@ -45,5 +45,14 @@ public class GeographicPoint extends Double {
     	return "Lat: " + getX() + ", Lon: " + getY();
     }
 	
+
+	public boolean equals(Object obj) {
+		//GeographicPoint location = (GeographicPoint) obj;
+		if (obj instanceof GeographicPoint){
+			return this.toString().equals(obj.toString());
+		} else {
+			return false;
+		}
+	}
 	
 }
