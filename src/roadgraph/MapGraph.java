@@ -156,19 +156,31 @@ public class MapGraph {
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
-		ArrayList<GeographicPoint> path = new ArrayList<GeographicPoint>();
+		
 		HashMap<GeographicPoint, GeographicPoint> parentMap = 
 				new HashMap<GeographicPoint, GeographicPoint>();
 		
 		parentMap.put(start, null);
 		
+		boolean found = bfsSearch(start, goal, parentMap, nodeSearched);
+		
+		//construct path
+		if (!found) return null;
+		else {
+			return constructPath(goal, parentMap);
+		}
+	}
+	
+	private boolean bfsSearch(GeographicPoint start, GeographicPoint goal, 
+			HashMap<GeographicPoint, GeographicPoint> parentMap, 
+			Consumer<GeographicPoint> nodeSearched){
+		boolean found = false;
 		HashSet<GeographicPoint> explored = new HashSet<GeographicPoint>();
 		Queue<GeographicPoint> queue = new LinkedList<GeographicPoint>();
 		queue.add(start);
 		explored.add(start);
 		nodeSearched.accept(start);
 		
-		boolean found = false;
 		while( !queue.isEmpty() ){
 			GeographicPoint current = queue.poll();
 			
@@ -187,19 +199,21 @@ public class MapGraph {
 			}
 			
 		}
-		
-		//construct path
-		if (!found) return null;
-		else {
-			GeographicPoint node = goal;
-			while(node != null){
-				path.add(0, node);
-				node = parentMap.get(node);
-			}
-			return path;
-		}
+		return found;
 	}
 	
+	private ArrayList<GeographicPoint> constructPath(GeographicPoint goal,
+			HashMap<GeographicPoint, GeographicPoint> parentMap){
+		
+		ArrayList<GeographicPoint> path = new ArrayList<GeographicPoint>();
+		
+		GeographicPoint node = goal;
+		while(node != null){
+			path.add(0, node);
+			node = parentMap.get(node);
+		}
+		return path;
+	}
 
 	/** Find the path from start to goal using Dijkstra's algorithm
 	 * 
