@@ -77,12 +77,22 @@ class MapEdge
 	}
 	
 	// return the length
-	double getLength()
+	double getLength(boolean argumentOrNot)
 	{
+		if(!argumentOrNot) return length;
+		else {
+			double cost = length/RoadType.SpeedMap.get(roadType);
+			return cost;
+		}
+	}
+	
+	double getLength(){
 		return length;
 	}
 	
-	
+	public String getRoadType(){
+		return roadType;
+	}
 	
 	// return road name
 	public String getRoadName()
